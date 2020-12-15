@@ -84,9 +84,74 @@ class Projectile(object):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 
+class enemy(object):
+
+    walkRight = [pygame.image.load(os.path.join('charModel', 'R1E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R2E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R3E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R4E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R5E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R6E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R7E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R8E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R9E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R10E.png')),
+                 pygame.image.load(os.path.join('charModel', 'R11E.png'))]
+
+    walkLeft = [pygame.image.load(os.path.join('charModel', 'L1E.png')),
+                pygame.image.load(os.path.join('charModel', 'L2E.png')),
+                pygame.image.load(os.path.join('charModel', 'L3E.png')),
+                pygame.image.load(os.path.join('charModel', 'L4E.png')),
+                pygame.image.load(os.path.join('charModel', 'L5E.png')),
+                pygame.image.load(os.path.join('charModel', 'L6E.png')),
+                pygame.image.load(os.path.join('charModel', 'L7E.png')),
+                pygame.image.load(os.path.join('charModel', 'L8E.png')),
+                pygame.image.load(os.path.join('charModel', 'L9E.png')),
+                pygame.image.load(os.path.join('charModel', 'L10E.png')),
+                pygame.image.load(os.path.join('charModel', 'L11E.png'))]
+
+    def __init__(self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.end = end
+        self.path = [self.x, self.end]
+        self.walkCount = 0
+        self.vel = 3
+
+    def draw(self, win):
+        self.move()
+        if self.walkCount + 1 >= 33:
+            self.walkCount = 0
+
+        if self.vel > 0:
+            win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
+            self.walkCount += 1
+        else:
+            win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
+            self.walkCount += 1
+
+    def move(self):
+        if self.vel > 0:
+            if self.x + self.vel < self.path[1]:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.walkCount = 0
+        else:
+            if self.x - self.vel > self.path[0]:
+                self.x += self.vel
+            else:
+                self.vel = self.vel * -1
+                self.walkCount = 0
+
+
+
 def redrawGameWindow():
     win.blit(bg, (0, 0))
     warrior.draw(win)
+    goblin.draw(win)
     for bullet in bullets:
         bullet.draw(win)
 
@@ -95,6 +160,7 @@ def redrawGameWindow():
 
 # mainloop
 warrior = PlayerModel(200, 410, 64, 64)
+goblin = enemy(100, 410, 64, 64, 450)
 bullets = []
 run = True
 while run:
@@ -118,7 +184,9 @@ while run:
         else:
             facing = 1
         if len(bullets) < 5:
-            bullets.append(Projectile(round(warrior.x + warrior.width // 2), round(warrior.y + warrior.height // 2), 6, (0, 0, 0), facing))
+            bullets.append(
+                Projectile(round(warrior.x + warrior.width // 2), round(warrior.y + warrior.height // 2), 6, (0, 0, 0),
+                           facing))
 
     if keys[pygame.K_LEFT] and warrior.x > warrior.vel:
         warrior.x -= warrior.vel
@@ -154,5 +222,3 @@ while run:
     redrawGameWindow()
 
 pygame.quit()
-
-
